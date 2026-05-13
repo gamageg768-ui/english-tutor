@@ -49,3 +49,4 @@ data/pdf-metadata.json
 
 # PDF uploads — served from Vercel Blob in production
 public/pdfs/*.pdf
+*/dev.db
