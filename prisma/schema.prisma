@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  conversations            Conversation[]
+  corrections              Correction[]
+  customSituations         CustomSituation[]
+  vocabulary               Vocabulary[]
+  flashcards               Flashcard[]
+  dailyGoals               DailyGoals?
+  achievements             Achievement[]
+  writingSubmissions       WritingSubmission[]
+  dailyChallenges          DailyChallenge[]
+  readingExercises         ReadingExercise[]
+  debateSessions           DebateSession[]
+  errorCorrectionExercises ErrorCorrectionExercise[]
+  sentenceBuilderSessions  SentenceBuilderSession[]
+  collocationSessions      CollocationSession[]
+}
+
+model Conversation {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  situationId    String
+  situationTitle String
+  messages       String
+  corrections    String
+  timestamp      DateTime @default(now())
+  completed      Boolean  @default(false)
+
+  user              User         @relation(fields: [userId], references: [id])
+  correctionRecords Correction[]
+}
+
+model Correction {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  conversationId Int
+  original       String
+  corrected      String
+  fullSentence   String   @default("")
+  explanation    String
+  category       String   @default("Grammar")
+  timestamp      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+}
+
+model CustomSituation {
+  id          String   @id
+  userId      Int
+  title       String
+  description String
+  level       String
+  scenario    String
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Vocabulary {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  word            String
+  pos             String
+  definition      String
+  example         String
+  sourceSituation String   @default("")
+  savedAt         DateTime @default(now())
+  reviewCount     Int      @default(0)
+  mastered        Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Flashcard {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  front       String
+  back        String
+  category    String   @default("Grammar")
+  nextReview  DateTime @default(now())
+  reviewCount Int      @default(0)
+  easeFactor  Float    @default(2.5)
+  interval    Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model DailyGoals {
+  userId               Int     @id
+  conversationsTarget  Int     @default(3)
+  mcqTarget            Int     @default(10)
+  conversationsToday   Int     @default(0)
+  mcqCorrectToday      Int     @default(0)
+  currentDate          String?
+  streak               Int     @default(0)
+  lastActivityDate     String?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Achievement {
+  id          String   @default("")
+  userId      Int
+  name        String
+  description String
+  icon        String
+  unlockedAt  DateTime @default(now())
+
+  @@id([id, userId])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model WritingSubmission {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  prompt      String
+  content     String
+  level       String
+  scores      String
+  feedback    String
+  submittedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model DailyChallenge {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  challengeDate String
+  challengeType String
+  completed     Boolean  @default(false)
+  score         Int      @default(0)
+  completedAt   DateTime?
+
+  @@unique([userId, challengeDate])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model ReadingExercise {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  title       String
+  passage     String
+  level       String
+  topic       String
+  passageType String
+  questions   String
+  userAnswers String   @default("[]")
+  score       Int      @default(0)
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model DebateSession {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  topic        String
+  position     String
+  level        String
+  category     String
+  exchanges    String   @default("[]")
+  scores       String   @default("{}")
+  overallScore Int      @default(0)
+  completedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model ErrorCorrectionExercise {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  topic       String
+  level       String
+  errorTypes  String   @default("[]")
+  totalErrors Int      @default(0)
+  errorsFound Int      @default(0)
+  score       Int      @default(0)
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SentenceBuilderSession {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  level          String
+  exerciseType   String
+  grammarFocus   String
+  totalExercises Int      @default(0)
+  correctCount   Int      @default(0)
+  score          Int      @default(0)
+  completedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model CollocationSession {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  category       String
+  level          String
+  quizType       String
+  totalQuestions Int      @default(0)
+  correctCount   Int      @default(0)
+  score          Int      @default(0)
+  completedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model PdfDocument {
+  id          Int      @id @default(autoincrement())
+  filename    String   @unique
+  title       String
+  description String   @default("")
+  category    String   @default("General")
+  pages       Int?
+  url         String
+  blobUrl     String?
+  uploaded    DateTime @default(now())
+}

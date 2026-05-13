@@ -1,0 +1,35 @@
+{
+  "name": "English Tutor — AI-Powered English Learning",
+  "short_name": "English Tutor",
+  "description": "Master English with AI-powered conversation practice, grammar lessons, and personalized feedback.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1b4b",
+  "theme_color": "#1e1b4b",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Practice Situations",
+      "url": "/",
+      "description": "Browse and start conversation practice"
+    }
+  ]
+}
